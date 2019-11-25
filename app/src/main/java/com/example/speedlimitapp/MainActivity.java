@@ -1,0 +1,194 @@
+package com.example.speedlimitapp;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import android.Manifest;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    // Request Codes
+    private static final int REQ_CODE_LOC = 700;
+    private static final int REQ_CODE_SETTINGS = 710;
+
+    // Declare UI components
+    private Button startButton;
+    private Button stopButton;
+    private Button viewViolButton;
+    private Button helpButton;
+    private TextView speedText;
+
+    // Location managements objects
+    LocationManager locationManager;
+    LocationListener locationListener;
+
+    // Other Variables
+    private float currentSpeed;
+    private float currentLimit;
+    private float defaultLimit;
+    private String currentSpeedType;
+    private String defaultSpeedType;
+    private SharedPreferences sharedPreferences;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize UI components
+        startButton = findViewById(R.id.start_button);
+        stopButton = findViewById(R.id.stop_button);
+        viewViolButton = findViewById(R.id.view_speed_viol_button);
+        helpButton = findViewById(R.id.help_button);
+        speedText = findViewById(R.id.speedText);
+
+        // Initialize location objects
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        setUpLocationListener();
+
+        // Setup Button Listeners
+        setUpButtonListeners();
+
+        //Initialize other variables
+        currentSpeed = 0;
+        sharedPreferences = this.getSharedPreferences(getString(R.string.settings_preferences), this.MODE_PRIVATE);
+        defaultLimit = 0;
+        defaultSpeedType = "m/s";
+        currentLimit = sharedPreferences.getFloat(getString(R.string.sp_speed_limit), defaultLimit);
+        currentSpeedType = sharedPreferences.getString(getString(R.string.sp_speed_type), defaultSpeedType);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.settings_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.app_settings:
+            {
+                // Starts settings activity after sending current limit and type
+                Intent settingIntent = new Intent(this, Settings.class);
+                settingIntent.putExtra("currentSpeedLimit", currentLimit);
+                settingIntent.putExtra("currentSpeedType", currentSpeedType);
+                startActivityForResult(settingIntent, REQ_CODE_SETTINGS);
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Sets up listeners for all the buttons
+     */
+    private void setUpButtonListeners(){
+        // Setting up Start button with 'this' activity as listener
+        // Easier to provide arguments this way
+        startButton.setOnClickListener(this);
+
+        // Setting up the other buttons
+        stopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                locationManager.removeUpdates(locationListener);
+                speedText.setText(R.string.speed_view_default);
+            }
+        });
+    }
+
+    /**
+     * Sets up location listener
+     */
+    private void setUpLocationListener(){
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                currentSpeed = transformSpeed(location.getSpeed(), currentSpeedType);
+                speedText.setText(getString(R.string.speed_view_with_value, currentSpeed, currentSpeedType));
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+    }
+
+    // OnClick listener for the Start button
+    @Override
+    public void onClick(View v) {
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQ_CODE_LOC);
+        }
+        else{
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0, locationListener);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case REQ_CODE_LOC:
+                // If permission for location is granted click again on start button
+                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
+                    startButton.performClick();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQ_CODE_SETTINGS: {
+                // After Settings activity returns results, if ok, update current speed limit
+                // and speed type
+                if(resultCode == RESULT_OK) {
+                    currentLimit = sharedPreferences.getFloat(getString(R.string.sp_speed_limit), defaultLimit);
+                    currentSpeedType = sharedPreferences.getString(getString(R.string.sp_speed_type), defaultSpeedType);
+                }
+            }
+        }
+    }
+
+    /**
+     * Transforms speed according to the type given
+     * @param speed speed in m/s
+     * @param type  type (e.g m/s, km/h, etc.)
+     * @return  Speed transformed according to type
+     */
+    private float transformSpeed(float speed, String type){
+        switch(type){
+            case "m/s":
+                return speed;
+            case "km/h":
+                return (speed*3600)/1000;
+        }
+        return speed;
+    }
+}
