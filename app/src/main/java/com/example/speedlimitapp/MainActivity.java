@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             }
             case REQ_CODE_SPEECH_REC:{
-                if(requestCode==RESULT_OK){
+                if(resultCode==RESULT_OK){
                     ArrayList<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     for (String command : results) {
                         if(!commands.contains(command.toLowerCase())){
