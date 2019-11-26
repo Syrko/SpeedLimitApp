@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.sql.Timestamp;
 
@@ -39,12 +40,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LocationListener locationListener;
 
     // Other Variables
+    private static final long MIN_TIME_LOC_UPDATE = 1000;
+
     private float currentSpeed;
     private float currentLimit;
     private float defaultLimit;
     private String currentSpeedType;
     private String defaultSpeedType;
     private SharedPreferences sharedPreferences;
+    private TTSWarnings ttsWarnings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         defaultSpeedType = "m/s";
         currentLimit = sharedPreferences.getFloat(getString(R.string.sp_speed_limit), defaultLimit);
         currentSpeedType = sharedPreferences.getString(getString(R.string.sp_speed_type), defaultSpeedType);
+        ttsWarnings = new TTSWarnings(getApplicationContext());
     }
 
     @Override
@@ -109,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onClick(View v) {
                 locationManager.removeUpdates(locationListener);
                 speedText.setText(R.string.speed_view_default);
+                DatabaseHelper.getInstance(getBaseContext()).ClearDatabase(); // TODO Remove this line after testing
             }
         });
     }
@@ -122,10 +128,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onLocationChanged(Location location) {
                 currentSpeed = transformSpeed(location.getSpeed(), currentSpeedType);
                 speedText.setText(getString(R.string.speed_view_with_value, currentSpeed, currentSpeedType));
-                if(currentSpeed > currentLimit){
-                    //TODO new thread for violation handling
-                    HandleSpeedLimitViolation(location);
-                }
+                //TODO new thread for violation handling
+                HandleSpeedLimitViolation(location);
             }
 
             @Override
@@ -152,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQ_CODE_LOC);
         }
         else{
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_LOC_UPDATE,0, locationListener);
         }
     }
 
@@ -198,16 +202,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return speed;
     }
 
+    private int counter = 0; // Counter to see if the violation will be saved
+    private static final int SECS_BETWEEN_VIOLATIONS = 10;
     /**
      * Handles the speed limit violation by inserting it into the database
      * and displaying warning
      * @param location  The location of the violation
      */
     private void HandleSpeedLimitViolation(Location location){
-        SpeedLimitViolation violation = new SpeedLimitViolation(location.getLongitude(),
-                location.getLatitude(),
-                location.getSpeed() + currentSpeedType,
-                new Timestamp(location.getTime()));
-        DatabaseHelper.getInstance(getBaseContext()).InsertSpeedLimitViolation(violation);
+        counter++;
+        if(counter < SECS_BETWEEN_VIOLATIONS){
+            return;
+        }
+        else{
+            counter = 0;
+            if(currentSpeed > currentLimit){
+                SpeedLimitViolation violation = new SpeedLimitViolation(location.getLongitude(),
+                        location.getLatitude(),
+                        location.getSpeed() + currentSpeedType,
+                        new Timestamp(location.getTime()));
+                DatabaseHelper.getInstance(getBaseContext()).InsertSpeedLimitViolation(violation);
+                Toast.makeText(this, "VIOLATION", Toast.LENGTH_LONG).show();
+            }
+            ttsWarnings.SpeakSpeedWarning();
+        }
     }
 }
