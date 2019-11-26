@@ -6,7 +6,11 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public final class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -119,6 +123,19 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
         return violations;
+    }
+
+    public ArrayList<SpeedLimitViolation> getTodayViolations(){
+        ArrayList<SpeedLimitViolation> validViolations = getAllTimeViolations();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String today = sdf.format(new Date());
+        for(int i = validViolations.size() - 1; i >= 0; i--){
+
+            if(!validViolations.get(i).getTimestampAsString().substring(0, 10).equals(today)){
+                validViolations.remove(i);
+            }
+        }
+        return validViolations;
     }
 
     public void ClearDatabase(){

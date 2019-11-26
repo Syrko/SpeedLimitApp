@@ -81,7 +81,17 @@ public class ViewViolations extends AppCompatActivity {
                 return;
             }
             case DAY_MODE:{
-                // TODO implement
+                ArrayList<SpeedLimitViolation> violations = DatabaseHelper.getInstance(this).getTodayViolations();
+                for(SpeedLimitViolation violation : violations){
+                    dataToShow.append("Longitude: " + violation.getLongitudeAsString() + "\n");
+                    dataToShow.append("Latitude: " + violation.getLatitudeAsString() + "\n");
+                    dataToShow.append("Speed: " + violation.getSpeedAsString() + "\n");
+                    dataToShow.append("Time: " + violation.getTimestampAsString() + "\n");
+                    dataToShow.append("============\n");
+                }
+                if(dataToShow.toString().equals(""))
+                    Toast.makeText(getBaseContext(), "No violations recorded!", Toast.LENGTH_SHORT).show();
+                data.setText(dataToShow.toString());
                 return;
             }
         }
