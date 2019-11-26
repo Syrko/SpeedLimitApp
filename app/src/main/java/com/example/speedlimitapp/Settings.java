@@ -8,8 +8,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.HashMap;
@@ -20,6 +22,8 @@ public class Settings extends AppCompatActivity {
     private EditText speedLimit;
     private Spinner speedType;
     private Button confirmButton;
+    private Switch switchClear;
+    private Button buttonClear;
 
     // Other variables
     private SharedPreferences sharedPreferences;
@@ -39,6 +43,8 @@ public class Settings extends AppCompatActivity {
         speedLimit = findViewById(R.id.settings_speed_limit_input);
         speedType = findViewById(R.id.speed_type_spinner);
         confirmButton = findViewById(R.id.confirm_settings_button);
+        buttonClear = findViewById(R.id.clearDbButton);
+        switchClear = findViewById(R.id.clearDbSwitch);
 
         // Initialize other variables
         sharedPreferences = this.getSharedPreferences(getString(R.string.settings_preferences), Context.MODE_PRIVATE);
@@ -49,8 +55,11 @@ public class Settings extends AppCompatActivity {
         // Initialize settings
         speedLimit.setText(String.format("%.2f", initSpeedLimit));
         speedType.setSelection(speedTypes.get(initSpeedType));
+        switchClear.setChecked(false);
+        buttonClear.setEnabled(false);
 
         // Setup Listeners
+        setUpSwitchListeners();
         setUpButtonListeners();
     }
 
@@ -72,6 +81,25 @@ public class Settings extends AppCompatActivity {
                 Toast.makeText(getBaseContext(), "Settings Saved!", Toast.LENGTH_LONG).show();
                 setResult(RESULT_OK);
                 finish();
+            }
+        });
+
+        buttonClear.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                DatabaseHelper.getInstance(getBaseContext()).ClearDatabase();
+                Toast.makeText(getBaseContext(), "Database Cleared!", Toast.LENGTH_LONG).show();
+                switchClear.setChecked(false);
+                return true;
+            }
+        });
+    }
+
+    private void setUpSwitchListeners(){
+        switchClear.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                buttonClear.setEnabled(isChecked);
             }
         });
     }
