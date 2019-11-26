@@ -12,6 +12,7 @@
     <string name="sp_speed_limit">sp_speed_limit</string>
     <string name="sp_speed_type">sp_speed_type</string>
     <string name="voice_command_button">Voice Commands</string>
+    <string name="help_button">\?</string>
     <string-array name="speed_type">
         <item>m/s</item>
         <item>km/h</item>
