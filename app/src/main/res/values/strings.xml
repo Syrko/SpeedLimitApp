@@ -13,6 +13,12 @@
     <string name="sp_speed_type">sp_speed_type</string>
     <string name="voice_command_button">Voice Commands</string>
     <string name="help_button">\?</string>
+    <string name="all_time_violations_button">All time violations</string>
+    <string name="this_weeks_violations_button">This week\'s violations</string>
+    <string name="all_time_viol_title">All Time Violations</string>
+    <string name="week_viol_title">This Week\'s Violations</string>
+    <string name="view_viol_on_map_button">View Violations On Map</string>
+    <string name="clear_db_switch_button">Hold To Clear Database</string>
     <string-array name="speed_type">
         <item>m/s</item>
         <item>km/h</item>
