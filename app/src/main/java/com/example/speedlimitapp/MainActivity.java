@@ -19,6 +19,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.sql.Timestamp;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Request Codes
@@ -120,6 +122,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onLocationChanged(Location location) {
                 currentSpeed = transformSpeed(location.getSpeed(), currentSpeedType);
                 speedText.setText(getString(R.string.speed_view_with_value, currentSpeed, currentSpeedType));
+                if(currentSpeed > currentLimit){
+                    //TODO new thread for violation handling
+                    HandleSpeedLimitViolation(location);
+                }
             }
 
             @Override
@@ -190,5 +196,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return (speed*3600)/1000;
         }
         return speed;
+    }
+
+    /**
+     * Handles the speed limit violation by inserting it into the database
+     * and displaying warning
+     * @param location  The location of the violation
+     */
+    private void HandleSpeedLimitViolation(Location location){
+        SpeedLimitViolation violation = new SpeedLimitViolation(location.getLongitude(),
+                location.getLatitude(),
+                location.getSpeed() + currentSpeedType,
+                new Timestamp(location.getTime()));
+        DatabaseHelper.getInstance(getBaseContext()).InsertSpeedLimitViolation(violation);
     }
 }
