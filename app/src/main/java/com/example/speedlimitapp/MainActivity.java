@@ -286,9 +286,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         transformSpeed(location.getSpeed(), currentSpeedType) + currentSpeedType,
                         new Timestamp(location.getTime()));
                 DatabaseHelper.getInstance(getBaseContext()).InsertSpeedLimitViolation(violation);
-                Toast.makeText(this, "VIOLATION", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "SPEED LIMIT VIOLATION", Toast.LENGTH_LONG).show();
+                ttsWarnings.SpeakSpeedWarning();
             }
-            ttsWarnings.SpeakSpeedWarning();
         }
     }
 }
