@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 settingIntent.putExtra("currentSpeedLimit", currentLimit);
                 settingIntent.putExtra("currentSpeedType", currentSpeedType);
                 startActivityForResult(settingIntent, REQ_CODE_SETTINGS);
+                return  true;
             }
         }
         return super.onOptionsItemSelected(item);
@@ -114,7 +115,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onClick(View v) {
                 locationManager.removeUpdates(locationListener);
                 speedText.setText(R.string.speed_view_default);
-                DatabaseHelper.getInstance(getBaseContext()).ClearDatabase(); // TODO Remove this line after testing
+            }
+        });
+
+        viewViolButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getBaseContext(), ViewViolationsMenu.class));
             }
         });
     }
@@ -128,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onLocationChanged(Location location) {
                 currentSpeed = transformSpeed(location.getSpeed(), currentSpeedType);
                 speedText.setText(getString(R.string.speed_view_with_value, currentSpeed, currentSpeedType));
-                //TODO new thread for violation handling
                 HandleSpeedLimitViolation(location);
             }
 
@@ -164,10 +170,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode){
-            case REQ_CODE_LOC:
+            case REQ_CODE_LOC: {
                 // If permission for location is granted click again on start button
-                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     startButton.performClick();
+                return;
+            }
         }
     }
 
@@ -182,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     currentLimit = sharedPreferences.getFloat(getString(R.string.sp_speed_limit), defaultLimit);
                     currentSpeedType = sharedPreferences.getString(getString(R.string.sp_speed_type), defaultSpeedType);
                 }
+                return;
             }
         }
     }
@@ -219,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(currentSpeed > currentLimit){
                 SpeedLimitViolation violation = new SpeedLimitViolation(location.getLongitude(),
                         location.getLatitude(),
-                        location.getSpeed() + currentSpeedType,
+                        transformSpeed(location.getSpeed(), currentSpeedType) + currentSpeedType,
                         new Timestamp(location.getTime()));
                 DatabaseHelper.getInstance(getBaseContext()).InsertSpeedLimitViolation(violation);
                 Toast.makeText(this, "VIOLATION", Toast.LENGTH_LONG).show();
