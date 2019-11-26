@@ -13,6 +13,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,18 +22,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Request Codes
     private static final int REQ_CODE_LOC = 700;
     private static final int REQ_CODE_SETTINGS = 710;
+    private static final int REQ_CODE_SPEECH_REC = 720;
 
     // Declare UI components
     private Button startButton;
     private Button stopButton;
     private Button viewViolButton;
     private Button helpButton;
+    private Button voiceCommands;
     private TextView speedText;
 
     // Location managements objects
@@ -50,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SharedPreferences sharedPreferences;
     private TTSWarnings ttsWarnings;
 
+    // Voice Commands Available
+    private static final ArrayList<String> commands = new ArrayList<String>(){{add("start"); add("stop"); add("help"); add("history");}};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         stopButton = findViewById(R.id.stop_button);
         viewViolButton = findViewById(R.id.view_speed_viol_button);
         helpButton = findViewById(R.id.help_button);
+        voiceCommands = findViewById(R.id.voice_commands_button);
         speedText = findViewById(R.id.speedText);
 
         // Initialize location objects
@@ -131,6 +139,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(getBaseContext(), Help.class));
             }
         });
+
+        voiceCommands.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent voiceRecognition = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                voiceRecognition.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                voiceRecognition.putExtra(RecognizerIntent.EXTRA_PROMPT, "What is your command?");
+                startActivityForResult(voiceRecognition, REQ_CODE_SPEECH_REC);
+            }
+        });
     }
 
     /**
@@ -199,9 +217,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 return;
             }
+            case REQ_CODE_SPEECH_REC:{
+                if(requestCode==RESULT_OK){
+                    ArrayList<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    for (String command : results) {
+                        if(!commands.contains(command.toLowerCase())){
+                            continue;
+                        }
+                        else{
+                            switch(command){
+                                case "start":{
+                                    startButton.performClick();
+                                    return;
+                                }
+                                case "stop":{
+                                    stopButton.performClick();
+                                    return;
+                                }
+                                case "help":{
+                                    helpButton.performClick();
+                                    return;
+                                }
+                                case "history":{
+                                    viewViolButton.performClick();
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    Toast.makeText(getBaseContext(), "Unrecognizable command. Please try again or click on the help button.", Toast.LENGTH_LONG);
+                }
+            }
         }
     }
-
     /**
      * Transforms speed according to the type given
      * @param speed speed in m/s
