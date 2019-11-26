@@ -23,4 +23,5 @@
         <item>m/s</item>
         <item>km/h</item>
     </string-array>
+    <string name="title_activity_show_violations_on_map">Map</string>
 </resources>
