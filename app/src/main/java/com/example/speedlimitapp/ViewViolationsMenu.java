@@ -37,7 +37,7 @@ public class ViewViolationsMenu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent viewViol = new Intent(getBaseContext(), ViewViolations.class);
-                viewViol.putExtra("mode", ViewViolations.WEEK_MODE);
+                viewViol.putExtra("mode", ViewViolations.DAY_MODE);
                 startActivity(viewViol);
             }
         });

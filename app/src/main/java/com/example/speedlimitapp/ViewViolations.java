@@ -3,7 +3,6 @@ package com.example.speedlimitapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 
 public class ViewViolations extends AppCompatActivity {
     public static final int ALL_MODE = 0;
-    public static final int WEEK_MODE = 1;
+    public static final int DAY_MODE = 1;
 
 
     // Mode for all-time violations or week's violations
@@ -50,8 +49,8 @@ public class ViewViolations extends AppCompatActivity {
                 title.setText(R.string.all_time_viol_title);
                 return;
             }
-            case WEEK_MODE:{
-                title.setText(R.string.week_viol_title);
+            case DAY_MODE:{
+                title.setText(R.string.day_viol_title);
                 return;
             }
         }
@@ -81,7 +80,7 @@ public class ViewViolations extends AppCompatActivity {
                 data.setText(dataToShow.toString());
                 return;
             }
-            case WEEK_MODE:{
+            case DAY_MODE:{
                 // TODO implement
                 return;
             }

@@ -33,6 +33,6 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:textSize="60sp"
-            android:text="@string/this_weeks_violations_button"/>
+            android:text="@string/this_days_violations_button"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
