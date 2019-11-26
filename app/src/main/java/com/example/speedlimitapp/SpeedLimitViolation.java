@@ -4,8 +4,8 @@ import java.sql.Timestamp;
 
 public class SpeedLimitViolation {
 
-    private float longitude;
-    private float latitude;
+    private double longitude;
+    private double latitude;
     private String speed;
     private Timestamp timestamp;
 
@@ -17,8 +17,8 @@ public class SpeedLimitViolation {
      * @param timestamp timestamp of the violation
      */
     public SpeedLimitViolation(String longitude, String latitude, String speed, String timestamp){
-        this.longitude = Float.parseFloat(longitude);
-        this.latitude = Float.parseFloat(latitude);
+        this.longitude = Double.parseDouble(longitude);
+        this.latitude = Double.parseDouble(latitude);
         this.speed = speed;
         this.timestamp = new Timestamp(Long.parseLong(timestamp));
     }
@@ -30,7 +30,7 @@ public class SpeedLimitViolation {
      * @param speed     speed of the violation
      * @param timestamp timestamp of the violation
      */
-    public SpeedLimitViolation(float longitude, float latitude, String speed, Timestamp timestamp){
+    public SpeedLimitViolation(double longitude, double latitude, String speed, Timestamp timestamp){
         this.longitude = longitude;
         this.latitude = latitude;
         this.speed = speed;
@@ -38,11 +38,11 @@ public class SpeedLimitViolation {
     }
     //================================================
     // Simple getters
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
