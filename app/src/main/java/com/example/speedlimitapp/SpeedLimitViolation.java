@@ -7,7 +7,7 @@ public class SpeedLimitViolation {
     private double longitude;
     private double latitude;
     private String speed;
-    private Timestamp timestamp;
+    private String timestamp;
 
     /**
      * Constructs violation object with arguments as strings from the database
@@ -20,7 +20,7 @@ public class SpeedLimitViolation {
         this.longitude = Double.parseDouble(longitude);
         this.latitude = Double.parseDouble(latitude);
         this.speed = speed;
-        this.timestamp = new Timestamp(Long.parseLong(timestamp));
+        this.timestamp = timestamp;
     }
 
     /**
@@ -34,7 +34,7 @@ public class SpeedLimitViolation {
         this.longitude = longitude;
         this.latitude = latitude;
         this.speed = speed;
-        this.timestamp = timestamp;
+        this.timestamp = timestamp.toString();
     }
     //================================================
     // Simple getters
@@ -50,7 +50,7 @@ public class SpeedLimitViolation {
         return speed;
     }
 
-    public Timestamp getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
     //================================================
