@@ -124,6 +124,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(getBaseContext(), ViewViolationsMenu.class));
             }
         });
+
+        helpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getBaseContext(), Help.class));
+            }
+        });
     }
 
     /**
