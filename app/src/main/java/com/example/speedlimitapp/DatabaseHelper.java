@@ -42,12 +42,22 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * @param db    The database
      */
     private void CreateViolationsTable(SQLiteDatabase db){
-        String sqlQuery = "CREATE TABLE IF NOT EXISTS " + VIOLATIONS_TABLE +" (" +
-                            "longitude TEXT NOT NULL, " +
-                            "latitude TEXT NOT NULL, " +
-                            "speed TEXT NOT NULL, " +
-                            "timestamp TEXT NOT NULL);";
-        db.execSQL(sqlQuery);
+        db.beginTransaction();
+        try {
+            String sqlQuery = "CREATE TABLE IF NOT EXISTS " + VIOLATIONS_TABLE + " (" +
+                    "longitude TEXT NOT NULL, " +
+                    "latitude TEXT NOT NULL, " +
+                    "speed TEXT NOT NULL, " +
+                    "timestamp TEXT NOT NULL);";
+            db.execSQL(sqlQuery);
+            db.setTransactionSuccessful();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            db.endTransaction();
+        }
     }
 
     /**
@@ -109,5 +119,24 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             db.endTransaction();
         }
         return violations;
+    }
+
+    public void ClearDatabase(){
+        SQLiteDatabase db = getWritableDatabase();
+
+        String sqlQuery = "DROP TABLE IF EXISTS " + VIOLATIONS_TABLE + ";";
+
+        db.beginTransaction();
+        try{
+            db.execSQL(sqlQuery);
+            CreateViolationsTable(db);
+            db.setTransactionSuccessful();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            db.endTransaction();
+        }
     }
 }
