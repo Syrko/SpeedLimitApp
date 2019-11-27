@@ -37,11 +37,11 @@ public class Help extends AppCompatActivity {
         String wallOfText = "\n" +
                 "   This is a mobile application compatible with android 7.1+ and " +
                 "developed in Android Studio with Java.\n\n" +
-                "   Users can enable location tracking and get notified in case they violate" +
+                "   Users can enable location tracking and get notified in case they violate " +
                 "the speed limit. This speed limit can be set by the user in the app settings.\n\n" +
-                "   Violation data are stored in the app's database and can be viewed by clicking" +
+                "   Violation data are stored in the app's database and can be viewed by clicking " +
                 "the relevant button.\n\n" +
-                "   For the basic operation in the main menu voice commands are available! Just" +
+                "   For the basic operations in the main menu voice commands are available! Just " +
                 "say: 'Start', 'Stop', 'Help' or 'History'.\n\n" +
                 "   In addition users may view their violations on a map.\n\n" +
                 "For the source code click on the button below!\n\n" +
