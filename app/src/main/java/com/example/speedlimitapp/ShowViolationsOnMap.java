@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -50,16 +49,19 @@ public class ShowViolationsOnMap extends FragmentActivity implements OnMapReadyC
         // Get violations depending on mode
         ArrayList<SpeedLimitViolation> violations;
         switch (mode){
+            // All time mode
             case 0:
             {
                 violations = DatabaseHelper.getInstance(getBaseContext()).getAllTimeViolations();
                 break;
             }
+            // This day mode
             case 1:
             {
                 violations = DatabaseHelper.getInstance(getBaseContext()).getTodayViolations();
                 break;
             }
+            // In case of error
             default:
             {
                 Toast.makeText(getBaseContext(), "Error loading map!", Toast.LENGTH_LONG).show();

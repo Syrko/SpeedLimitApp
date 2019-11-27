@@ -58,6 +58,9 @@ public class ViewViolations extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sets up the required button listeners
+     */
     private void setUpButtonListeners(){
         viewOnMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,7 +73,7 @@ public class ViewViolations extends AppCompatActivity {
     }
 
     /**
-     * Shows data depending on mode
+     * Displays data depending on mode
      */
     private void showData(){
         StringBuilder dataToShow = new StringBuilder();

@@ -93,6 +93,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * For handling selection on the menu of the app
+     * @param item Selected item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()){
@@ -110,11 +115,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * Sets up listeners for all the buttons
+     * Sets up the required button listeners
      */
     private void setUpButtonListeners(){
         // Setting up Start button with 'this' activity as listener
-        // Easier to provide arguments this way
+        // Easier to provide arguments this way because of location permission
         startButton.setOnClickListener(this);
 
         // Setting up the other buttons
@@ -158,8 +163,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                // First transforms current speed according to type
                 currentSpeed = transformSpeed(location.getSpeed(), currentSpeedType);
+                // Then displays it
                 speedText.setText(getString(R.string.speed_view_with_value, currentSpeed, currentSpeedType));
+                // And finally handles the value(e.g checks for violation of limit)
                 HandleSpeedLimitViolation(location);
             }
 
@@ -180,13 +188,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
     }
 
-    // OnClick listener for the Start button
+    /**
+     * OnClick listener for the Start button
+     * Requests location permission if not already granted
+     */
     @Override
     public void onClick(View v) {
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQ_CODE_LOC);
         }
         else{
+            // Request permission with MIN_TIME intervals (On writing, 1 sec) for less energy consumption
+            // and implementing a kind of timer while handling location updates
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_LOC_UPDATE,0, locationListener);
         }
     }
@@ -218,6 +231,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             }
             case REQ_CODE_SPEECH_REC:{
+                // Handles speech recognition activity result
+                // If the word returned is among the commands defined perform the
+                // corresponding action
                 if(resultCode==RESULT_OK){
                     ArrayList<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     for (String command : results) {
@@ -245,11 +261,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         }
                     }
-                    Toast.makeText(getBaseContext(), "Unrecognizable command. Please try again or click on the help button.", Toast.LENGTH_LONG);
+                    // If execution reaches here it means the word recognized wasn't a valid command,
+                    // and and an error is shown
+                    Toast.makeText(getBaseContext(), "Unrecognizable command. Please try again or click on the help button.", Toast.LENGTH_LONG).show();
                 }
             }
         }
     }
+
     /**
      * Transforms speed according to the type given
      * @param speed speed in m/s
@@ -266,6 +285,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return speed;
     }
 
+    // Implementing a kind of counter
+    // As location updates are(at time of writing) in 1 sec intervals I use a counter
+    // to avoid spamming the database with violations
+    // Now the application checks for violation only every 10 seconds but renews the speed value
+    // every second
     private int counter = 0; // Counter to see if the violation will be saved
     private static final int SECS_BETWEEN_VIOLATIONS = 10;
     /**

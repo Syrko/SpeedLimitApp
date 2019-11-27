@@ -16,6 +16,13 @@ import android.widget.Toast;
 
 import java.util.HashMap;
 
+/**
+ * Activity containing the app settings
+ * List of settings implemented:
+ *      Speed Limit: The user inputs a number and chooses the units
+ *      Clear DB:    After checking a switch, a button is enabled that when long clicked
+ *                   clears the database of the app
+ */
 public class Settings extends AppCompatActivity {
 
     // Declare UI components
@@ -63,6 +70,9 @@ public class Settings extends AppCompatActivity {
         setUpButtonListeners();
     }
 
+    /**
+     * Sets up the required button listeners
+     */
     private void setUpButtonListeners(){
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +105,9 @@ public class Settings extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sets up the required switch listeners
+     */
     private void setUpSwitchListeners(){
         switchClear.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

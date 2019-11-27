@@ -5,15 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.awt.font.TextAttribute;
-
+/**
+ * Simple activity showing some helpful text for the user and providing a button that link to
+ * the project's GitHub page
+ */
 public class Help extends AppCompatActivity {
 
+    // GitHub link of the project
     private static final String URL = "https://github.com/Syrko/SpeedLimitApp";
 
     // Declare UI components
@@ -33,6 +35,9 @@ public class Help extends AppCompatActivity {
         setUpButtonListeners();
     }
 
+    /**
+     * Displays the wall of helpful text
+     */
     private void setHelpText(){
         String wallOfText = "\n" +
                 "   This is a mobile application compatible with android 7.1+ and " +
@@ -49,6 +54,9 @@ public class Help extends AppCompatActivity {
         helpText.setText(wallOfText);
     }
 
+    /**
+     * Sets up the required button listeners
+     */
     private void setUpButtonListeners(){
         goToSite.setOnClickListener(new View.OnClickListener() {
             @Override

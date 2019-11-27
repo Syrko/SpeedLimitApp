@@ -7,18 +7,22 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * Database helper class for making the necessary calls to the database.
+ * Implemented as a singleton.
+ * Using SQLite as DB and so the class extends SQLiteHelper
+ */
 public final class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "Speed_Limit_Violations_Db";
     private static final String VIOLATIONS_TABLE ="Violations";
     private static final int DATABASE_VERSION = 1;
 
-
+    //===========================================================================
+    // Singleton implementation
     private static DatabaseHelper instance = null;
     private DatabaseHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,6 +34,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
         return instance;
     }
+    //===========================================================================
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -125,6 +130,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return violations;
     }
 
+    /**
+     * Gets today's violations by getting the data from the db and "weeding out" the entries
+     * whose date isn't equal with today's.
+     * @return  ArrayList with SpeedLimitViolation objects corresponding to today's violations
+     */
     public ArrayList<SpeedLimitViolation> getTodayViolations(){
         ArrayList<SpeedLimitViolation> validViolations = getAllTimeViolations();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -138,6 +148,10 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return validViolations;
     }
 
+    /**
+     * Drops all the tables and creates them again effectively clearing the database
+     * For now only the Violation table exists.
+     */
     public void ClearDatabase(){
         SQLiteDatabase db = getWritableDatabase();
 
