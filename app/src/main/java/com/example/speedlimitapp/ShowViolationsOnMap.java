@@ -3,7 +3,9 @@ package com.example.speedlimitapp;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -11,9 +13,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 public class ShowViolationsOnMap extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private int mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +28,9 @@ public class ShowViolationsOnMap extends FragmentActivity implements OnMapReadyC
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // Get mode from extras -- default all time mode
+        mode = getIntent().getIntExtra("mode", 0);
     }
 
 
@@ -39,9 +47,43 @@ public class ShowViolationsOnMap extends FragmentActivity implements OnMapReadyC
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        // Get violations depending on mode
+        ArrayList<SpeedLimitViolation> violations;
+        switch (mode){
+            case 0:
+            {
+                violations = DatabaseHelper.getInstance(getBaseContext()).getAllTimeViolations();
+                break;
+            }
+            case 1:
+            {
+                violations = DatabaseHelper.getInstance(getBaseContext()).getTodayViolations();
+                break;
+            }
+            default:
+            {
+                Toast.makeText(getBaseContext(), "Error loading map!", Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+        }
+
+        // Shows error if no violations in database
+        if(violations.isEmpty()){
+            Toast.makeText(getBaseContext(), "Alert -- No violations to show on map!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // Placing markers on map
+        LatLng temp = null;
+        for(SpeedLimitViolation violation : violations){
+            temp = new LatLng(violation.getLatitude(), violation.getLongitude());
+            String title = violation.getSpeedAsString() + " | " + violation.getTimestampAsString().substring(0,10);
+            mMap.addMarker(new MarkerOptions().position(temp).title(title));
+        }
+
+        // Zooming in lst marker position
+        if(temp!=null)
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(temp));
     }
 }

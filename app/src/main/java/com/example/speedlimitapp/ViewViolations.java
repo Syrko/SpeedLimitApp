@@ -62,7 +62,9 @@ public class ViewViolations extends AppCompatActivity {
         viewOnMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getBaseContext(), ShowViolationsOnMap.class));
+                Intent mapIntent = new Intent(getBaseContext(), ShowViolationsOnMap.class);
+                mapIntent.putExtra("mode", mode);
+                startActivity(mapIntent);
             }
         });
     }
