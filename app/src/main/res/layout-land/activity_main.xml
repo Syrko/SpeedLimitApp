@@ -38,22 +38,20 @@
             <Button
                 android:id="@+id/start_button"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="70dp"
                 android:layout_weight="1"
                 android:text="@string/start_speed_watching_button"/>
             <Space
                 android:layout_width="50dp"
-                android:layout_height="100dp"/>
+                android:layout_height="70dp"/>
             <Button
                 android:id="@+id/stop_button"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="70dp"
                 android:layout_weight="1"
                 android:text="@string/stop_speed_watching_button"/>
         </LinearLayout>
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="50dp"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,7 +60,7 @@
             <Button
             android:id="@+id/view_speed_viol_button"
             android:layout_width="200dp"
-            android:layout_height="100dp"
+            android:layout_height="70dp"
             android:layout_gravity="center"
                 android:layout_weight="1"
             android:text="@string/view_violations_button"/>
