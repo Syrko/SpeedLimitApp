@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // to avoid spamming the database with violations
     // Now the application checks for violation only every 10 seconds but renews the speed value
     // every second
-    private int counter = 0; // Counter to see if the violation will be saved
+    private int counter = 10; // Counter to see if the violation will be saved -- Starts at 10 to immediately check for violation
     private static final int SECS_BETWEEN_VIOLATIONS = 10;
     /**
      * Handles the speed limit violation by inserting it into the database
